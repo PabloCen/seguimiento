@@ -1,0 +1,15 @@
+{
+  "name": "Trazio · Mi negocio",
+  "short_name": "Mi negocio",
+  "description": "Copia de solo lectura de tu negocio en Trazio",
+  "lang": "es-AR",
+  "start_url": "nube.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#111318",
+  "theme_color": "#111318",
+  "icons": [
+    { "src": "nube-icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "nube-icono-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

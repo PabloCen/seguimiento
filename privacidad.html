@@ -78,7 +78,7 @@
     <p>Trazio es una aplicación de escritorio para Windows que ayuda a comercios y talleres de reparación a administrar ventas, stock, caja, clientes y reparaciones. La desarrolla Pablo Centurión, desde Neuquén, Argentina. Para cualquier consulta sobre esta política podés escribir a <a href="mailto:soporte@trazioapp.com.ar">soporte@trazioapp.com.ar</a>.</p>
 
     <h2>Tus datos quedan en tu computadora</h2>
-    <p>Todo lo que cargás en Trazio (productos, ventas, caja, clientes, proveedores y reparaciones) se guarda en una base de datos dentro de la computadora del comercio. Nosotros no tenemos acceso a esa información y no la recibimos.</p>
+    <p>Todo lo que cargás en Trazio (productos, ventas, caja, clientes, proveedores y reparaciones) se guarda en una base de datos dentro de la computadora del comercio. Nosotros no tenemos acceso a esa información. Si el dueño activa la copia en la nube, recibimos una copia cifrada que no podemos leer (ver más abajo).</p>
     <ul>
       <li>En la versión de Microsoft Store, los datos se guardan en la carpeta <strong>Trazio</strong> dentro de la carpeta del usuario de Windows. Al desinstalar la aplicación esa carpeta no se borra, para que el comercio no pierda su información por error. El dueño puede borrarla cuando quiera.</li>
       <li>Las copias de seguridad se guardan en la carpeta que elija el dueño (por defecto, <strong>Documentos\Trazio\Copias</strong>). Si esa carpeta está sincronizada con un servicio en la nube, como OneDrive, las copias se suben a esa cuenta del propio comercio.</li>
@@ -92,6 +92,7 @@
     <ul>
       <li><strong>Seguimiento online de reparaciones.</strong> Si el comercio lo activa, se envía a nuestro servidor lo necesario para que su cliente consulte el estado de su equipo con un código: el código de seguimiento, el número de orden, la descripción del equipo, el estado, las fechas, el total, la seña, el saldo y las fotos de la reparación, junto con el nombre y el teléfono del comercio. <strong>No se envían el nombre, el teléfono ni la dirección del cliente.</strong> Cuando el comercio borra una reparación o una foto, también se borra del servidor.</li>
       <li><strong>Acceso remoto.</strong> Si el comercio lo activa, la conexión desde el celular pasa por un túnel cifrado de Cloudflare hasta la computadora del comercio. Para entrar hace falta un usuario y una contraseña del comercio.</li>
+      <li><strong>Copia en la nube.</strong> Si el dueño la activa, la computadora sube una copia de las reparaciones (con el nombre y el teléfono del cliente), las ventas de los últimos 60 días, la caja y el stock, para que el dueño la vea desde el celular con la computadora apagada. La copia se cifra dentro de la computadora del comercio y solo se abre con el usuario y la contraseña de un dueño: nosotros guardamos la copia cifrada, pero no podemos leerla. Las contraseñas nunca salen de la computadora. Cuando el dueño desactiva la copia, se borra del servidor.</li>
       <li><strong>Activación.</strong> Al activar Trazio con un código, la aplicación lo consulta una sola vez en nuestro servidor para recibir la licencia y la configuración del comercio.</li>
       <li><strong>Prueba gratis.</strong> Al empezar la prueba de 30 días, se envía un identificador anónimo de la computadora (un resumen cifrado que no permite saber de qué equipo se trata) y se guarda la fecha de inicio, para que la prueba no se reinicie al reinstalar.</li>
       <li><strong>Diagnóstico.</strong> El botón "Enviar diagnóstico" arma un informe técnico dentro de la computadora. Nunca se envía solo: el dueño lo ve primero y decide si lo copia o lo guarda para mandárnoslo. El informe no incluye claves, contraseñas ni datos de clientes.</li>
@@ -100,9 +101,9 @@
     <h2>Servicios de terceros</h2>
     <p>Para esas funciones usamos estos proveedores, que pueden tener sus servidores fuera de Argentina:</p>
     <ul>
-      <li><strong>Supabase:</strong> base de datos y almacenamiento de fotos del seguimiento online, de la activación y de la prueba gratis.</li>
+      <li><strong>Supabase:</strong> base de datos y almacenamiento de fotos del seguimiento online, de la copia cifrada en la nube, de la activación y de la prueba gratis.</li>
       <li><strong>Cloudflare:</strong> túnel del acceso remoto y dominio trazioapp.com.ar.</li>
-      <li><strong>GitHub Pages:</strong> página pública donde el cliente consulta el estado de su reparación.</li>
+      <li><strong>GitHub Pages:</strong> página pública donde el cliente consulta el estado de su reparación y página donde el dueño abre la copia en la nube.</li>
       <li><strong>Microsoft Store:</strong> descarga e instalación de la aplicación.</li>
     </ul>
     <p>No vendemos ni compartimos datos con nadie para publicidad. Trazio no muestra publicidad ni incluye herramientas de seguimiento o estadísticas de uso.</p>

@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trazio · Mi negocio</title>
+<meta name="description" content="Copia de solo lectura de tu negocio en Trazio, para verla con la PC del local apagada.">
+<meta name="theme-color" content="#111318">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="nube.webmanifest">
+<link rel="icon" href="nube-icono-192.png">
+<link rel="apple-touch-icon" href="nube-icono-192.png">
+<style>
+  :root {
+    --tinta: #111318; --tinta-2: #262a33; --lima: #c6f135; --lima-osc: #3f6212; --lima-claro: #f1fad2;
+    --fondo: #f3f3f0; --tarjeta: #ffffff; --borde: #e3e3de; --texto: #16181d; --suave: #5f6470;
+    --rojo: #c62828; --rojo-claro: #fdecec; --ambar: #a16207; --ambar-claro: #fef3d7;
+    --azul: #1d4ed8; --azul-claro: #e6edff; --verde: #2e7d4f; --verde-claro: #e2f2e7;
+    --sombra: 0 1px 2px rgba(17,19,24,.06), 0 6px 20px rgba(17,19,24,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fondo: #0e0f12; --tarjeta: #16181d; --borde: #262a32; --texto: #eef0f3; --suave: #9aa1ad;
+      --lima-osc: #c6f135; --lima-claro: rgba(198,241,53,.12);
+      --rojo: #ff8a80; --rojo-claro: rgba(255,138,128,.12); --ambar: #fbbf24; --ambar-claro: rgba(251,191,36,.12);
+      --azul: #8fb0ff; --azul-claro: rgba(143,176,255,.12); --verde: #6ee7a8; --verde-claro: rgba(110,231,168,.12);
+      --sombra: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--fondo); color: var(--texto); font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; -webkit-text-size-adjust: 100%; }
+  button, input { font: inherit; color: inherit; }
+  .barra { background: var(--tinta); color: #fff; padding: calc(14px + env(safe-area-inset-top)) 16px 14px; }
+  .barra-fila { display: flex; align-items: center; gap: 10px; max-width: 760px; margin: 0 auto; }
+  .marca { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .marca svg.nombre { height: 18px; width: auto; }
+  .negocio { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #d9dce2; }
+  .salir { background: transparent; border: 1px solid #3a3f4a; color: #fff; border-radius: 10px; padding: 7px 12px; font-size: 14px; cursor: pointer; }
+  .estado-copia { max-width: 760px; margin: 10px auto 0; font-size: 13px; color: #c9cdd5; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .chip-lima { background: var(--lima); color: var(--tinta); font-weight: 700; border-radius: 999px; padding: 2px 10px; font-size: 12px; }
+  main { max-width: 760px; margin: 0 auto; padding: 16px 16px calc(32px + env(safe-area-inset-bottom)); }
+  .tarjeta { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 16px; box-shadow: var(--sombra); padding: 16px; }
+  h1 { font-size: 22px; margin: 4px 0 6px; }
+  .ayuda { color: var(--suave); font-size: 14px; margin: 0 0 16px; }
+  label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 6px; }
+  input[type=text], input[type=password], input[type=search] { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--borde); background: var(--tarjeta); outline: none; }
+  input:focus { border-color: var(--tinta); box-shadow: 0 0 0 3px rgba(198,241,53,.55); }
+  @media (prefers-color-scheme: dark) { input:focus { border-color: var(--lima); box-shadow: 0 0 0 3px rgba(198,241,53,.22); } }
+  .boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 18px; padding: 13px 16px; border-radius: 12px; border: 0; background: var(--tinta); color: #fff; font-weight: 700; cursor: pointer; }
+  @media (prefers-color-scheme: dark) { .boton { background: var(--lima); color: var(--tinta); } }
+  .boton:disabled { opacity: .6; cursor: wait; }
+  .error { margin-top: 14px; padding: 10px 12px; border-radius: 10px; background: var(--rojo-claro); color: var(--rojo); font-size: 14px; }
+  .aviso { margin: 0 0 14px; padding: 10px 12px; border-radius: 12px; background: var(--ambar-claro); color: var(--ambar); font-size: 14px; }
+  .pestanas { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 12px; margin: 0 -2px; scrollbar-width: none; }
+  .pestanas::-webkit-scrollbar { display: none; }
+  .pestana { flex: none; border: 1px solid var(--borde); background: var(--tarjeta); border-radius: 999px; padding: 8px 14px; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--suave); }
+  .pestana[aria-selected=true] { background: var(--tinta); border-color: var(--tinta); color: #fff; }
+  @media (prefers-color-scheme: dark) { .pestana[aria-selected=true] { background: var(--lima); border-color: var(--lima); color: var(--tinta); } }
+  .grilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .dato { padding: 14px; }
+  .dato .tit { font-size: 13px; color: var(--suave); font-weight: 600; }
+  .dato .num { font-size: 22px; font-weight: 800; margin-top: 4px; letter-spacing: -.02em; }
+  .dato .sub { font-size: 13px; color: var(--suave); margin-top: 2px; }
+  .lista { display: flex; flex-direction: column; gap: 10px; }
+  .fila { padding: 14px; }
+  .fila-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .fila-tit { font-weight: 700; }
+  .fila-sub { color: var(--suave); font-size: 14px; margin-top: 2px; }
+  .monto { font-weight: 800; white-space: nowrap; }
+  .badge { display: inline-block; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+  .b-pendiente { background: var(--ambar-claro); color: var(--ambar); }
+  .b-en_reparacion { background: var(--azul-claro); color: var(--azul); }
+  .b-terminada { background: var(--verde-claro); color: var(--verde); }
+  .b-rojo { background: var(--rojo-claro); color: var(--rojo); }
+  .b-ambar { background: var(--ambar-claro); color: var(--ambar); }
+  .filtros { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 12px; }
+  .filtro { border: 1px solid var(--borde); background: transparent; border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; color: var(--suave); }
+  .filtro[aria-pressed=true] { background: var(--lima-claro); border-color: var(--lima-osc); color: var(--lima-osc); font-weight: 700; }
+  .dia { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--suave); margin: 14px 2px 6px; }
+  .items { margin: 10px 0 0; padding: 10px 0 0; border-top: 1px dashed var(--borde); font-size: 14px; color: var(--suave); }
+  .items div { display: flex; justify-content: space-between; gap: 10px; }
+  .tabla { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .tabla td { padding: 7px 0; border-bottom: 1px solid var(--borde); }
+  .tabla td:last-child { text-align: right; font-weight: 700; }
+  .tabla tr:last-child td { border-bottom: 0; }
+  .seccion { font-size: 15px; font-weight: 800; margin: 18px 2px 8px; }
+  .vacio { color: var(--suave); text-align: center; padding: 24px 8px; }
+  a.tel { color: var(--lima-osc); font-weight: 600; text-decoration: none; }
+  .pie { color: var(--suave); font-size: 12px; text-align: center; margin-top: 24px; }
+  details summary { cursor: pointer; list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header class="barra">
+  <div class="barra-fila">
+    <div class="marca">
+      <svg viewBox="0 0 256 256" width="34" height="34" aria-hidden="true"><rect width="256" height="256" rx="60" fill="#262A33"/><rect x="52" y="56" width="152" height="56" rx="16" fill="#C6F135"/><rect x="88" y="94" width="80" height="10" rx="5" fill="#111318"/><path d="M100 99H156V194L149 203L142 194L135 203L128 194L121 203L114 194L107 203L100 194Z" fill="#fff"/><g stroke="#111318" stroke-width="7" stroke-linecap="round"><path d="M115 134H141"/><path d="M115 154H131"/></g></svg>
+      <svg class="nombre" viewBox="5 -816 3569.0 832" role="img" aria-label="Trazio"><path d="M5 -432V-513L123 -556L203 -722H309V-570H555V-432H309V-244Q309 -180 335.0 -154.5Q361 -129 428 -129Q471 -129 503.5 -136.5Q536 -144 565 -157V-16Q535 -4 486.5 6.0Q438 16 386 16Q295 16 236.5 -13.0Q178 -42 150.5 -94.5Q123 -147 123 -218V-432Z M604.0 -570H792.0L817.0 -418Q832.0 -461 856.0 -497Q884.0 -538 925.5 -562.0Q967.0 -586 1026.0 -586Q1043.0 -586 1062.0 -584.0Q1081.0 -582 1098.0 -578V-418Q1071.0 -424 1044.5 -427.0Q1018.0 -430 996.0 -430Q948.0 -430 909.5 -410.5Q871.0 -391 848.5 -349.0Q826.0 -307 826.0 -240V0H640.0V-380Z M1655.0 0 1640.0 -121Q1599.0 -57 1538.0 -22Q1474.0 16 1394.0 16Q1310.0 16 1246.5 -22.0Q1183.0 -60 1147.0 -127.5Q1111.0 -195 1111.0 -285.0Q1111.0 -375 1147.0 -442.5Q1183.0 -510 1246.5 -548.0Q1310.0 -586 1394.0 -586Q1474.0 -586 1538.0 -549Q1599.0 -513 1641.0 -450L1655.0 -570H1848.0L1813.0 -285L1848.0 0ZM1299.0 -285Q1299.0 -239 1318.0 -203.5Q1337.0 -168 1370.5 -147.5Q1404.0 -127 1448.0 -127.0Q1492.0 -127 1531.5 -147.5Q1571.0 -168 1601.0 -203.5Q1631.0 -239 1646.0 -285Q1631.0 -331 1601.0 -366.5Q1571.0 -402 1531.5 -422.5Q1492.0 -443 1448.0 -443.0Q1404.0 -443 1370.5 -422.5Q1337.0 -402 1318.0 -366.5Q1299.0 -331 1299.0 -285Z M1911.0 0V-130L2283.0 -435H1914.0V-570H2515.0V-440L2144.0 -135H2517.0V0Z M2596.0 -578 2688.0 -559 2781.0 -578V0H2596.0ZM2689.0 -630Q2640.0 -630 2609.0 -655.5Q2578.0 -681 2578.0 -723Q2578.0 -766 2609.0 -791.0Q2640.0 -816 2689.0 -816Q2739.0 -816 2769.0 -791.0Q2799.0 -766 2799.0 -723Q2799.0 -681 2769.0 -655.5Q2739.0 -630 2689.0 -630Z M3213.0 16Q3105.0 16 3024.0 -22.0Q2943.0 -60 2898.0 -128.0Q2853.0 -196 2853.0 -285Q2853.0 -375 2898.0 -442.5Q2943.0 -510 3024.5 -548.0Q3106.0 -586 3213.0 -586Q3321.0 -586 3402.5 -548.0Q3484.0 -510 3529.0 -442.5Q3574.0 -375 3574.0 -285Q3574.0 -195 3529.0 -127.5Q3484.0 -60 3402.5 -22.0Q3321.0 16 3213.0 16ZM3213.0 -124Q3268.0 -124 3306.5 -143.5Q3345.0 -163 3365.5 -199.0Q3386.0 -235 3386.0 -285Q3386.0 -335 3365.5 -371.0Q3345.0 -407 3306.5 -426.5Q3268.0 -446 3213.0 -446Q3160.0 -446 3121.0 -426.5Q3082.0 -407 3061.0 -371.0Q3040.0 -335 3040.0 -285Q3040.0 -235 3061.0 -199.0Q3082.0 -163 3121.0 -143.5Q3160.0 -124 3213.0 -124Z" fill="#fff"/></svg>
+      <span class="negocio" id="nombre-negocio"></span>
+    </div>
+    <button class="salir" id="salir" hidden>Salir</button>
+  </div>
+  <div class="estado-copia" id="estado-copia" hidden></div>
+</header>
+
+<main>
+  <section id="vista-ingreso" class="tarjeta" hidden>
+    <h1>Tu negocio, con la PC apagada</h1>
+    <p class="ayuda">Es una copia de solo lectura que la PC del local sube cada vez que hay cambios. Entrá con tu usuario y contraseña de Trazio.</p>
+    <form id="form-ingreso" autocomplete="on">
+      <label for="usuario">Usuario</label>
+      <input type="text" id="usuario" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required>
+      <button class="boton" id="entrar" type="submit">Ver mi negocio</button>
+      <div class="error" id="error-ingreso" role="alert" hidden></div>
+    </form>
+  </section>
+
+  <section id="vista-sin-link" class="tarjeta" hidden>
+    <h1>Falta el link de tu negocio</h1>
+    <p class="ayuda">Abrí este link desde Trazio, en la PC del local: Configuración → Copia en la nube → "Link para tu celular".</p>
+  </section>
+
+  <section id="vista-datos" hidden>
+    <div class="aviso" id="aviso-viejo" hidden></div>
+    <nav class="pestanas" role="tablist" id="pestanas">
+      <button class="pestana" role="tab" data-p="resumen" aria-selected="true">Resumen</button>
+      <button class="pestana" role="tab" data-p="reparaciones" aria-selected="false">Reparaciones</button>
+      <button class="pestana" role="tab" data-p="ventas" aria-selected="false">Ventas</button>
+      <button class="pestana" role="tab" data-p="caja" aria-selected="false">Caja</button>
+      <button class="pestana" role="tab" data-p="stock" aria-selected="false">Stock</button>
+    </nav>
+    <div id="contenido"></div>
+    <p class="pie">Solo lectura. Para cargar o cambiar algo, usá Trazio con la PC del local prendida.</p>
+  </section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var SUPABASE_URL = 'https://zzqgjokescjxbluhkxiz.supabase.co';
+  var CLAVE_PUBLICA = 'sb_publishable_WP0RToYw647gkXI0G3_Tlg_IAewQS1Z';
+  var AAD_DATOS = 'trazio-copia-v1';
+  var AAD_LLAVE = 'trazio-llave-v1';
+  var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var guardar = function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} };
+  var leer = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+
+  var negocio = (location.hash || '').replace('#', '').trim();
+  if (UUID.test(negocio)) guardar('trazio_nube_negocio', negocio.toLowerCase());
+  else negocio = leer('trazio_nube_negocio') || '';
+
+  var estado = { copia: null, actualizada: null, pestana: 'resumen', filtroRep: 'activas', filtroStock: 'todos', busqueda: {} };
+
+  // ---------- utilidades ----------
+  var pesos = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
+  function plata(n) { return pesos.format(Math.round(Number(n) || 0)); }
+  function esc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fechaLocal(texto) { // 'YYYY-MM-DD[ HH:MM[:SS]]' en hora del negocio
+    var m = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/.exec(String(texto || ''));
+    return m ? new Date(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0)) : null;
+  }
+  function claveDia(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function hora(d) { return d ? d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }) : ''; }
+  function diaLargo(d) { var t = d.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }); return t.charAt(0).toUpperCase() + t.slice(1); }
+  function diaCorto(d) { return d ? d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' }) : ''; }
+  function hace(d) {
+    var min = Math.round((Date.now() - d.getTime()) / 60000);
+    if (min < 1) return 'recién';
+    if (min < 60) return 'hace ' + min + ' min';
+    var h = Math.round(min / 60);
+    if (h < 24) return 'hace ' + h + (h === 1 ? ' hora' : ' horas');
+    var dias = Math.round(h / 24);
+    return 'hace ' + dias + (dias === 1 ? ' día' : ' días');
+  }
+  function normalizar(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+  function b64(texto) { var bin = atob(texto), out = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out; }
+  function hex(buf) { return Array.prototype.map.call(new Uint8Array(buf), function (b) { return b.toString(16).padStart(2, '0'); }).join(''); }
+  var utf8 = new TextEncoder();
+
+  function rpc(nombre, cuerpo) {
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/' + nombre, {
+      method: 'POST',
+      headers: { 'apikey': CLAVE_PUBLICA, 'Content-Type': 'application/json' },
+      body: JSON.stringify(cuerpo),
+    }).then(function (r) {
+      if (!r.ok) throw new Error('red');
+      return r.json();
+    });
+  }
+
+  async function abrirAesGcm(llaveBytes, datos, aad) {
+    var llave = await crypto.subtle.importKey('raw', llaveBytes, 'AES-GCM', false, ['decrypt']);
+    return crypto.subtle.decrypt({ name: 'AES-GCM', iv: datos.slice(0, 12), additionalData: utf8.encode(aad) }, llave, datos.slice(12));
+  }
+
+  async function ingresar(usuario, password) {
+    var u = usuario.trim().toLowerCase();
+    var sal = await rpc('copia_sal', { p_negocio: negocio, p_usuario: u });
+    var base = await crypto.subtle.importKey('raw', utf8.encode(password.normalize('NFC')), 'PBKDF2', false, ['deriveBits']);
+    var bits = new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: b64(sal.salt), iterations: sal.iter }, base, 512));
+    var res = await rpc('leer_copia', { p_negocio: negocio, p_usuario: u, p_auth: hex(bits.slice(32)) });
+    if (res.error === 'clave_incorrecta') throw new Error(res.restantes > 0 ? 'Usuario o contraseña incorrectos. Te quedan ' + res.restantes + ' intentos.' : 'Usuario o contraseña incorrectos. Esperá 15 minutos para volver a probar.');
+    if (res.error === 'bloqueado') throw new Error('Demasiados intentos. Probá de nuevo a las ' + hora(new Date(res.hasta)) + '.');
+    if (res.error === 'sin_copia') throw new Error('Todavía no hay una copia de este negocio. Activala en Trazio, en la PC del local.');
+    if (res.error) throw new Error('No se pudo abrir la copia.');
+    var llaveDatos = new Uint8Array(await abrirAesGcm(bits.slice(0, 32), b64(res.llave), AAD_LLAVE));
+    var comprimido = await abrirAesGcm(llaveDatos, b64(res.datos), AAD_DATOS);
+    var flujo = new Blob([comprimido]).stream().pipeThrough(new DecompressionStream('gzip'));
+    var copia = JSON.parse(await new Response(flujo).text());
+    if (!copia || copia.formato !== 1) throw new Error('Esta copia es de una versión más nueva de Trazio. Actualizá esta página.');
+    guardar('trazio_nube_usuario', usuario.trim());
+    return { copia: copia, actualizada: new Date(res.actualizada || res.creada) };
+  }
+
+  // ---------- vistas ----------
+  function mostrar(vista) {
+    ['vista-ingreso', 'vista-sin-link', 'vista-datos'].forEach(function (id) { $(id).hidden = id !== vista; });
+    $('salir').hidden = vista !== 'vista-datos';
+    $('estado-copia').hidden = vista !== 'vista-datos';
+  }
+
+  function encabezado() {
+    var c = estado.copia, d = estado.actualizada;
+    $('nombre-negocio').textContent = c.negocio && c.negocio.nombre ? c.negocio.nombre : '';
+    document.title = 'Trazio · ' + ((c.negocio && c.negocio.nombre) || 'Mi negocio');
+    $('estado-copia').innerHTML = '<span class="chip-lima">Solo lectura</span><span>Actualizada ' + esc(hace(d)) + ' · ' + esc(diaCorto(d)) + ' ' + esc(hora(d)) + '</span>';
+    var horas = (Date.now() - d.getTime()) / 3600000;
+    $('aviso-viejo').hidden = horas < 12;
+    $('aviso-viejo').textContent = 'La PC del local no se conecta desde el ' + diaCorto(d) + ' a las ' + hora(d) + '. Lo que ves es de ese momento.';
+  }
+
+  function ventasDelDia(dia) {
+    return (estado.copia.ventas || []).filter(function (v) { var d = fechaLocal(v.fecha); return d && claveDia(d) === dia && !v.anulada; });
+  }
+
+  function vistaResumen() {
+    var c = estado.copia, hoy = claveDia(new Date());
+    var vh = ventasDelDia(hoy), totalHoy = vh.reduce(function (s, v) { return s + (Number(v.total) || 0); }, 0);
+    var reps = c.reparaciones || [];
+    var pend = reps.filter(function (r) { return r.estado === 'pendiente'; }).length;
+    var enRep = reps.filter(function (r) { return r.estado === 'en_reparacion'; }).length;
+    var listasConSaldo = reps.filter(function (r) { return r.estado === 'terminada' && Number(r.saldo) > 0; });
+    var prods = c.productos || [];
+    var sinStock = prods.filter(function (p) { return Number(p.stock) <= 0; }).length;
+    var bajo = prods.filter(function (p) { return Number(p.stock) > 0 && Number(p.stock) <= Number(p.stock_minimo || 0); }).length;
+    var caja = c.caja || {}, act = caja.actual;
+    var h = '<div class="grilla">';
+    h += dato('Ventas de hoy', plata(totalHoy), vh.length + (vh.length === 1 ? ' venta' : ' ventas'));
+    h += caja.abierta && act ? dato('Caja abierta', plata(act.efectivo_esperado), 'efectivo esperado · desde ' + hora(fechaLocal(act.fecha_apertura))) : dato('Caja', 'Cerrada', caja.ultimas_cerradas && caja.ultimas_cerradas[0] ? 'último cierre ' + diaCorto(fechaLocal(caja.ultimas_cerradas[0].fecha_cierre)) : '');
+    h += dato('Reparaciones activas', String(pend + enRep), pend + (pend === 1 ? ' pendiente' : ' pendientes') + ' · ' + enRep + ' en reparación');
+    h += dato('Listas para retirar', String(listasConSaldo.length), listasConSaldo.length ? plata(listasConSaldo.reduce(function (s, r) { return s + Number(r.saldo || 0); }, 0)) + ' a cobrar' : 'sin saldo pendiente');
+    h += dato('Sin stock', String(sinStock), sinStock === 1 ? 'producto' : 'productos');
+    h += dato('Stock bajo', String(bajo), bajo === 1 ? 'producto' : 'productos');
+    h += '</div>';
+    return h;
+  }
+  function dato(tit, num, sub) { return '<div class="tarjeta dato"><div class="tit">' + esc(tit) + '</div><div class="num">' + esc(num) + '</div><div class="sub">' + esc(sub || '') + '</div></div>'; }
+
+  var NOMBRE_ESTADO = { pendiente: 'Pendiente', en_reparacion: 'En reparación', terminada: 'Terminada' };
+  function vistaReparaciones() {
+    var q = normalizar(estado.busqueda.reparaciones);
+    var lista = (estado.copia.reparaciones || []).filter(function (r) {
+      if (estado.filtroRep === 'activas' && r.estado === 'terminada') return false;
+      if (estado.filtroRep === 'terminadas' && r.estado !== 'terminada') return false;
+      if (!q) return true;
+      return normalizar([r.numero_orden, r.cliente, r.telefono, r.equipo, r.problema].join(' ')).indexOf(q) >= 0;
+    });
+    var h = buscador('reparaciones', 'Buscar por cliente, orden, equipo o teléfono');
+    h += filtros('filtroRep', [['activas', 'Activas'], ['terminadas', 'Terminadas'], ['todas', 'Todas']]);
+    if (!lista.length) return h + '<div class="vacio">No hay reparaciones para mostrar.</div>';
+    h += '<div class="lista">' + lista.map(function (r) {
+      var saldo = Number(r.saldo) || 0;
+      return '<div class="tarjeta fila"><div class="fila-top"><div><div class="fila-tit">Orden ' + esc(r.numero_orden) + ' · ' + esc(r.equipo || 'Equipo') + '</div>' +
+        '<div class="fila-sub">' + esc(r.cliente || '') + (r.telefono ? ' · <a class="tel" href="tel:' + esc(String(r.telefono).replace(/[^\d+]/g, '')) + '">' + esc(r.telefono) + '</a>' : '') + '</div></div>' +
+        '<span class="badge b-' + esc(r.estado) + '">' + esc(NOMBRE_ESTADO[r.estado] || r.estado) + '</span></div>' +
+        (r.problema ? '<div class="fila-sub" style="margin-top:8px">' + esc(r.problema) + '</div>' : '') +
+        '<div class="items"><div><span>Ingresó ' + esc(diaCorto(fechaLocal(r.fecha_ingreso))) + (r.fecha_terminada ? ' · terminada ' + esc(diaCorto(fechaLocal(r.fecha_terminada))) : '') + '</span><span>Total ' + esc(plata(r.total)) + '</span></div>' +
+        '<div><span>Seña ' + esc(plata(r.sena)) + ' · cobrado ' + esc(plata(r.cobrado)) + '</span><span class="monto"' + (saldo > 0 ? ' style="color:var(--rojo)"' : '') + '>Saldo ' + esc(plata(saldo)) + '</span></div></div></div>';
+    }).join('') + '</div>';
+    return h;
+  }
+
+  function vistaVentas() {
+    var q = normalizar(estado.busqueda.ventas);
+    var lista = (estado.copia.ventas || []).filter(function (v) {
+      if (!q) return true;
+      return normalizar([v.numero, v.cliente, v.metodo_pago].concat((v.items || []).map(function (i) { return i.nombre; })).join(' ')).indexOf(q) >= 0;
+    });
+    var h = buscador('ventas', 'Buscar por producto, cliente o número');
+    if (!lista.length) return h + '<div class="vacio">No hay ventas en la copia.</div>';
+    var grupos = {}, orden = [];
+    lista.forEach(function (v) { var d = fechaLocal(v.fecha); var k = d ? claveDia(d) : 'sin-fecha'; if (!grupos[k]) { grupos[k] = []; orden.push(k); } grupos[k].push(v); });
+    orden.forEach(function (k) {
+      var vs = grupos[k], total = vs.reduce(function (s, v) { return s + (v.anulada ? 0 : Number(v.total) || 0); }, 0);
+      var d = fechaLocal(k);
+      h += '<div class="dia"><span>' + esc(d ? diaLargo(d) : 'Sin fecha') + '</span><span>' + esc(plata(total)) + '</span></div><div class="lista">';
+      h += vs.map(function (v) {
+        return '<details class="tarjeta fila"><summary><div class="fila-top"><div><div class="fila-tit">' + esc(hora(fechaLocal(v.fecha))) + ' · ' + esc(v.numero || '') + '</div>' +
+          '<div class="fila-sub">' + esc(v.cliente || 'Consumidor final') + ' · ' + esc(String(v.metodo_pago || '').replace('_', ' ')) + '</div></div>' +
+          '<div class="monto"' + (v.anulada ? ' style="text-decoration:line-through;color:var(--suave)"' : '') + '>' + esc(plata(v.total)) + '</div></div></summary>' +
+          '<div class="items">' + (v.items || []).map(function (i) { return '<div><span>' + esc(i.cantidad) + ' × ' + esc(i.nombre) + '</span><span>' + esc(plata((Number(i.precio) || 0) * (Number(i.cantidad) || 0))) + '</span></div>'; }).join('') + '</div></details>';
+      }).join('') + '</div>';
+    });
+    return h;
+  }
+
+  function vistaCaja() {
+    var caja = estado.copia.caja || {}, act = caja.actual, h = '';
+    if (caja.abierta && act) {
+      var r = act.resumen || {};
+      h += '<div class="seccion">Caja abierta desde las ' + esc(hora(fechaLocal(act.fecha_apertura))) + ' del ' + esc(diaCorto(fechaLocal(act.fecha_apertura))) + '</div>';
+      h += '<div class="tarjeta"><table class="tabla">' +
+        fila('Monto inicial', act.monto_inicial) + fila('Efectivo', r.efectivo) + fila('Tarjeta', r.tarjeta) + fila('Transferencia', r.transferencia) +
+        fila('Cuenta corriente', r.cuenta_corriente) + fila('Cobros de reparaciones (incluidos)', r.cobros_reparaciones) + fila('Total vendido', r.total_general) +
+        fila('Retiros', -(Number(act.total_retirado) || 0)) + fila('Efectivo esperado en caja', act.efectivo_esperado) + '</table></div>';
+      if (act.retiros && act.retiros.length) {
+        h += '<div class="seccion">Retiros</div><div class="lista">' + act.retiros.map(function (x) {
+          return '<div class="tarjeta fila"><div class="fila-top"><div><div class="fila-tit">' + esc(x.motivo || 'Retiro') + '</div><div class="fila-sub">' + esc(hora(fechaLocal(x.fecha))) + '</div></div><div class="monto">' + esc(plata(x.monto)) + '</div></div></div>';
+        }).join('') + '</div>';
+      }
+    } else {
+      h += '<div class="tarjeta vacio">La caja está cerrada.</div>';
+    }
+    var cerradas = caja.ultimas_cerradas || [];
+    if (cerradas.length) {
+      h += '<div class="seccion">Últimos cierres</div><div class="lista">' + cerradas.map(function (x) {
+        var dif = Number(x.diferencia_efectivo) || 0;
+        return '<div class="tarjeta fila"><div class="fila-top"><div><div class="fila-tit">' + esc(diaLargo(fechaLocal(x.fecha_cierre) || fechaLocal(x.fecha_apertura))) + '</div>' +
+          '<div class="fila-sub">Contado ' + esc(plata(x.efectivo_contado)) + ' · esperado ' + esc(plata(x.efectivo_esperado)) + '</div></div>' +
+          '<div style="text-align:right"><div class="monto">' + esc(plata(x.total_general)) + '</div>' + (dif ? '<span class="badge ' + (dif < 0 ? 'b-rojo' : 'b-ambar') + '">' + (dif > 0 ? '+' : '') + esc(plata(dif)) + '</span>' : '') + '</div></div></div>';
+      }).join('') + '</div>';
+    }
+    return h;
+  }
+  function fila(t, n) { return '<tr><td>' + esc(t) + '</td><td>' + esc(plata(n)) + '</td></tr>'; }
+
+  function vistaStock() {
+    var q = normalizar(estado.busqueda.stock);
+    var lista = (estado.copia.productos || []).filter(function (p) {
+      var s = Number(p.stock) || 0, min = Number(p.stock_minimo) || 0;
+      if (estado.filtroStock === 'sin' && s > 0) return false;
+      if (estado.filtroStock === 'bajo' && !(s > 0 && s <= min)) return false;
+      if (!q) return true;
+      return normalizar([p.nombre, p.codigo, p.marca, p.categoria].join(' ')).indexOf(q) >= 0;
+    });
+    var h = buscador('stock', 'Buscar por nombre, código o marca');
+    h += filtros('filtroStock', [['todos', 'Todos'], ['bajo', 'Stock bajo'], ['sin', 'Sin stock']]);
+    if (!lista.length) return h + '<div class="vacio">No hay productos para mostrar.</div>';
+    var max = 300, extra = lista.length - max;
+    h += '<div class="lista">' + lista.slice(0, max).map(function (p) {
+      var s = Number(p.stock) || 0, min = Number(p.stock_minimo) || 0;
+      var badge = s <= 0 ? '<span class="badge b-rojo">Sin stock</span>' : (s <= min ? '<span class="badge b-ambar">' + esc(s) + ' u. · bajo</span>' : '<span class="badge b-terminada">' + esc(s) + ' u.</span>');
+      return '<div class="tarjeta fila"><div class="fila-top"><div><div class="fila-tit">' + esc(p.nombre) + '</div><div class="fila-sub">' + esc([p.codigo, p.marca, p.categoria].filter(Boolean).join(' · ')) + '</div></div>' +
+        '<div style="text-align:right"><div class="monto">' + esc(plata(p.precio)) + '</div>' + badge + '</div></div></div>';
+    }).join('') + '</div>';
+    if (extra > 0) h += '<div class="vacio">Y ' + extra + ' productos más. Usá el buscador.</div>';
+    return h;
+  }
+
+  function buscador(clave, texto) {
+    return '<input type="search" data-buscar="' + clave + '" placeholder="' + esc(texto) + '" value="' + esc(estado.busqueda[clave] || '') + '" aria-label="' + esc(texto) + '">';
+  }
+  function filtros(clave, opciones) {
+    return '<div class="filtros">' + opciones.map(function (o) { return '<button class="filtro" data-filtro="' + clave + '" data-valor="' + o[0] + '" aria-pressed="' + (estado[clave] === o[0]) + '">' + esc(o[1]) + '</button>'; }).join('') + '</div>';
+  }
+
+  var VISTAS = { resumen: vistaResumen, reparaciones: vistaReparaciones, ventas: vistaVentas, caja: vistaCaja, stock: vistaStock };
+  function pintar(mantenerFoco) {
+    var foco = mantenerFoco && document.activeElement && document.activeElement.getAttribute('data-buscar');
+    var pos = foco ? document.activeElement.selectionStart : null;
+    $('contenido').innerHTML = VISTAS[estado.pestana]();
+    Array.prototype.forEach.call(document.querySelectorAll('.pestana'), function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-p') === estado.pestana)); });
+    if (foco) { var el = document.querySelector('[data-buscar="' + foco + '"]'); if (el) { el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) {} } }
+  }
+
+  $('pestanas').addEventListener('click', function (e) {
+    var b = e.target.closest('.pestana'); if (!b) return;
+    estado.pestana = b.getAttribute('data-p'); pintar(); window.scrollTo(0, 0);
+  });
+  $('contenido').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-filtro]'); if (!b) return;
+    estado[b.getAttribute('data-filtro')] = b.getAttribute('data-valor'); pintar();
+  });
+  $('contenido').addEventListener('input', function (e) {
+    var clave = e.target.getAttribute('data-buscar'); if (!clave) return;
+    estado.busqueda[clave] = e.target.value; pintar(true);
+  });
+
+  $('form-ingreso').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var boton = $('entrar'), error = $('error-ingreso');
+    error.hidden = true; boton.disabled = true; boton.textContent = 'Abriendo la copia…';
+    try {
+      var res = await ingresar($('usuario').value, $('password').value);
+      estado.copia = res.copia; estado.actualizada = res.actualizada;
+      $('password').value = '';
+      encabezado(); mostrar('vista-datos'); pintar();
+    } catch (err) {
+      error.textContent = err && err.message && err.message !== 'red' ? err.message : 'No se pudo conectar. Revisá la conexión a internet del celular.';
+      if (err && err.name === 'OperationError') error.textContent = 'No se pudo abrir la copia. Probá de nuevo.';
+      error.hidden = false;
+    } finally {
+      boton.disabled = false; boton.textContent = 'Ver mi negocio';
+    }
+  });
+
+  $('salir').addEventListener('click', function () {
+    estado.copia = null; $('contenido').innerHTML = ''; $('nombre-negocio').textContent = '';
+    mostrar('vista-ingreso'); $('password').focus();
+  });
+
+  if (!window.crypto || !crypto.subtle || typeof DecompressionStream === 'undefined') {
+    mostrar('vista-ingreso');
+    $('error-ingreso').textContent = 'Este navegador es muy viejo para abrir la copia. Probá con Chrome o Safari actualizados.';
+    $('error-ingreso').hidden = false; $('entrar').disabled = true;
+  } else if (!UUID.test(negocio)) {
+    mostrar('vista-sin-link');
+  } else {
+    $('usuario').value = leer('trazio_nube_usuario') || '';
+    mostrar('vista-ingreso');
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('nube-sw.js').catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
