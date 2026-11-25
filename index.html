@@ -488,10 +488,6 @@
           }, [iconoWhatsapp(), document.createTextNode('Consultar por WhatsApp')]);
           acciones.appendChild(enlace);
         }
-        var tel = String(r.telefono || '').replace(/[^\d+]/g, '');
-        if (tel) {
-          acciones.appendChild(el('a', { className: 'boton boton-llamar', href: 'tel:' + tel, text: 'Llamar al taller' }));
-        }
         if (acciones.childNodes.length) app.appendChild(acciones);
 
         var actualizado = haceCuanto(r.actualizado_en);
