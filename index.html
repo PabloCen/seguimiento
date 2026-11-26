@@ -101,13 +101,16 @@
     .estado-pendiente { background: var(--ambar-claro); color: var(--ambar); }
     .estado-en_reparacion { background: var(--verde-claro); color: var(--verde); }
     .estado-terminada { background: var(--listo-claro); color: var(--listo); }
+    .estado-entregada { background: #ece8e1; color: var(--suave); }
+    .estado-texto strong { color: var(--texto); }
+    .aviso-plazo { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--ambar-claro); color: var(--ambar); font-weight: 600; }
     .estado-texto { margin: 12px 0 0; color: var(--suave); }
     .pasos {
       list-style: none;
       margin: 20px 0 0;
       padding: 0;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
     }
     .paso { text-align: center; font-size: 13px; color: var(--suave); }
@@ -257,7 +260,8 @@
       var ESTADOS = {
         pendiente: { nombre: 'Recibido', texto: 'Tu equipo ya está en el taller y está esperando su turno para ser revisado.', paso: 1 },
         en_reparacion: { nombre: 'En reparación', texto: 'El técnico está trabajando en tu equipo.', paso: 2 },
-        terminada: { nombre: 'Listo para retirar', texto: 'Tu equipo está listo. Podés pasar a retirarlo.', paso: 3 }
+        terminada: { nombre: 'Listo para retirar', texto: 'Tu equipo está listo. Podés pasar a retirarlo.', paso: 3 },
+        entregada: { nombre: 'Entregado', texto: 'Ya retiraste tu equipo. ¡Gracias por confiar en nosotros!', paso: 4 }
       };
 
       var app = document.getElementById('app');
@@ -291,6 +295,16 @@
         var d = /^\d{4}-\d{2}-\d{2}$/.test(texto) ? new Date(texto + 'T12:00:00') : new Date(texto);
         if (isNaN(d.getTime())) return null;
         return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      }
+
+      // Fecha límite para retirar: fecha_terminada + dias_retiro (si el taller lo usa).
+      function limiteRetiro(r) {
+        var dias = Number(r.dias_retiro);
+        if (!r.fecha_terminada || !isFinite(dias) || dias <= 0) return null;
+        var d = new Date(String(r.fecha_terminada));
+        if (isNaN(d.getTime())) return null;
+        d.setDate(d.getDate() + Math.round(dias));
+        return d;
       }
 
       function haceCuanto(valor) {
@@ -414,14 +428,17 @@
 
       function mostrarReparacion(r, codigo) {
         limpiar();
-        var estado = ESTADOS[r.estado] || ESTADOS.pendiente;
+        var clave = r.fecha_entregada ? 'entregada' : (ESTADOS[r.estado] ? r.estado : 'pendiente');
+        var estado = ESTADOS[clave];
+        var limite = clave === 'terminada' ? limiteRetiro(r) : null;
+        var vencido = limite ? limite.getTime() < Date.now() : false;
         var orden = String(r.numero_orden || '').trim();
         document.title = 'Orden ' + orden + ' · ' + estado.nombre;
 
         app.appendChild(cabecera('Orden N° ' + orden, r.negocio || ''));
 
         var pasos = el('ol', { className: 'pasos', 'aria-label': 'Avance de la reparación' },
-          ['Recibido', 'En reparación', 'Listo'].map(function (nombre, i) {
+          ['Recibido', 'En reparación', 'Listo', 'Entregado'].map(function (nombre, i) {
             var n = i + 1;
             var clase = 'paso' + (n <= estado.paso ? ' hecho' : '') + (n === estado.paso ? ' actual' : '');
             var li = el('li', { className: clase }, [el('div', { className: 'barra' }), document.createTextNode(nombre)]);
@@ -431,15 +448,20 @@
 
         app.appendChild(el('section', { className: 'tarjeta' }, [
           el('p', { className: 'etiqueta', text: 'Estado' }),
-          el('span', { className: 'estado-actual estado-' + (ESTADOS[r.estado] ? r.estado : 'pendiente'), text: estado.nombre }),
+          el('span', { className: 'estado-actual estado-' + clave, text: estado.nombre }),
           el('p', { className: 'estado-texto', text: estado.texto }),
+          limite ? el('p', { className: 'aviso-plazo', text: vencido
+            ? 'El plazo para retirarlo venció el ' + fecha(limite.toISOString()) + '. Consultá en el taller.'
+            : 'Podés retirarlo hasta el ' + fecha(limite.toISOString()) + '.' }) : null,
           pasos
-        ]));
+        ].filter(Boolean)));
 
         var datos = [];
         if (r.equipo) datos.push(['Equipo', r.equipo]);
         if (fecha(r.fecha_ingreso)) datos.push(['Ingresó', fecha(r.fecha_ingreso)]);
-        if (r.estado === 'terminada' && fecha(r.fecha_terminada)) datos.push(['Terminado', fecha(r.fecha_terminada)]);
+        if ((r.estado === 'terminada' || r.fecha_entregada) && fecha(r.fecha_terminada)) datos.push(['Listo desde', fecha(r.fecha_terminada)]);
+        if (limite) datos.push(['Retirar hasta', fecha(limite.toISOString())]);
+        if (fecha(r.fecha_entregada)) datos.push(['Entregado', fecha(r.fecha_entregada)]);
         if (datos.length) {
           app.appendChild(el('section', { className: 'tarjeta' }, [
             el('p', { className: 'etiqueta', text: 'Tu equipo' }),
